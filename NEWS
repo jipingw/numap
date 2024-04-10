@@ -1,0 +1,9 @@
+version 0.1.2
+	.remove chrom column in the out of bam parsing, in unique map, redundant map and 
+occupancy plot, as the file names all carry chromsome information
+	.include argument "chrom_to_include" such user can select which chromosomes of which the 
+data should output. In mouse and human genomes, there are lots of junk contigs. Users can 
+exclude them by provide such an argument.
+
+version 0.1.4
+	.corrected plotAATT function

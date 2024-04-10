@@ -1,0 +1,36 @@
+useDynLib(numap, .registration=TRUE)
+importFrom(Rcpp, evalCpp)
+import(methods)
+importFrom(Rsamtools,ScanBamParam,BamFile,indexBam,scanBamFlag,scanBam)
+importFrom(IRanges,IRanges,coverage)
+importFrom(GenomicRanges,seqinfo,seqnames,strand,makeGRangesFromDataFrame,reduce)
+importFrom(S4Vectors, countQueryHits, endoapply, queryHits, runValue)
+import(data.table)
+importFrom(seqinr,read.fasta)
+importFrom(rtracklayer,export.bw,export.bed,export.wig)
+importFrom(GenomeInfoDb,seqlengths,Seqinfo)
+importFrom(stats, setNames,cor,median)
+importFrom("grDevices", "dev.off", "pdf")
+importFrom("stats", "dnorm", "end", "quantile", "sd", "start")
+importFrom("utils", "read.table", "write.table","tail")
+importFrom(doParallel,registerDoParallel,stopImplicitCluster)
+importFrom(foreach, "%dopar%", foreach)
+importFrom(parallel, detectCores,makeCluster,stopCluster)
+## Export functions
+export( NCP_wrapper1,
+    NCP_wrapper4,
+    parse_bam_paired,
+    parse_bam_single,
+    NCP1,
+    occupancy,
+    NCP4,
+    plotAATT,
+    trainTEMP1,
+    trainTEMP1_masked,
+    TSS_occu,
+    occupancy_Mnase_paired,
+    parse_bam_paired_Mnase,
+    occupancy_Mnase_paired_par)
+
+
+
