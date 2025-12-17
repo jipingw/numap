@@ -164,6 +164,10 @@ parse_bam_paired=function(bam_file,result_path,chrom_to_include){
       watson=watson[cleavage>0.1,]
       crick=crick[cleavage>0.1,]
       setwd(result_path)
+      
+      watson$pos=format(watson$pos, scientific=FALSE)
+      crick$pos=format(crick$pos, scientific=FALSE)
+      options(scipen=999)
       fwrite(watson,file=paste(ch,".W.txt",sep=""),sep="\t")
       fwrite(crick,file=paste(ch,".C.txt",sep=""),sep="\t")
       }
@@ -255,6 +259,12 @@ parse_bam_single=function(bam_file,result_path,chrom_to_include){
 
       watson=watson[cleavage>0.1,]
       crick=crick[cleavage>0.1,]
+      
+      watson$pos <- format(watson$pos, scientific=FALSE)
+      watson$cleavage <- format(watson$cleavage,drop0trailing = TRUE, scientific=FALSE)
+      crick$pos <- format(crick$pos, scientific=FALSE)
+      crick$cleavage <- format(crick$cleavage,drop0trailing = TRUE, scientific=FALSE)
+      
       fwrite(watson,file=paste(ch,".W.txt",sep=""),sep="\t")
       fwrite(crick,file=paste(ch,".C.txt",sep=""),sep="\t")
       }
@@ -315,10 +325,13 @@ NCP1<-function(result_path, chromosome_path, temp1=NULL,unique_map_wsize=120){
       #NCP[,chr:=ch]
 
       #setcolorder(NCP,c(7,1,2,3,4,5,6))
+      
+      NCP$Position <- format(NCP$Position, scientific=FALSE)
       fwrite(NCP,file=paste("NCP.T1.",ch,".txt",sep=""),sep="\t")
 
       ##unique map >10% of k
-      seg=segment(k,k,gap_size=500,thresh=mean(k))
+      seg=segment(k,k,gap_size=500,thresh=0.25*mean(k))
+      #seg=segment(k,k,gap_size=500,thresh=quantile(k,0.10))
       #seg=segment(w_vector,c_vector,gap_size=500,thresh=0.01)
 
       seg_start=as.vector(seg[[1]])
@@ -338,6 +351,8 @@ NCP1<-function(result_path, chromosome_path, temp1=NULL,unique_map_wsize=120){
       rid=seq(1:length(k))[k>threshold_10]
       NCP_rmap=NCP[rid,1:6]
 
+      NCP_umap$Position <- format(NCP_umap$Position, scientific=FALSE)
+      NCP_rmap$Position <- format(NCP_rmap$Position, scientific=FALSE)
       fwrite(NCP_umap,file=paste("U.T1.",ch,".txt",sep=""),sep="\t")
       fwrite(NCP_rmap,file=paste("R.T1.",ch,".txt",sep=""),sep="\t")
       ###plot AATT by chromosomes
@@ -390,7 +405,9 @@ occupancy=function(redundant_map_list,result_path, chrom_length=NULL, T4=FALSE, 
 
     #chrom=as.character(unique(rmap[,1]))
     occu_out=data.table("pos"=c(1:n),"occu"=occu)
-
+    occu_out$pos <- format(occu_out$pos, scientific=FALSE)
+    occu_out$occu <- round(occu_out$occu,2)
+   
     ##define bed and wig formats
     bed=data.frame(chrom=chr,
                    start=c(0:(n-1)),
@@ -739,7 +756,9 @@ parse_bam_paired_Mnase=function(bam_file,result_path,chrom_to_include=NULL){
       bamout2$weight=round(bamout2$weight,2)
 
       rm(bamout1)
-
+      bamout2$start=format(bamout2$start, scientific=FALSE)
+      bamout2$end=format(bamout2$end, scientific=FALSE)
+      
       ###########
       ### convert parsed bam to cleavage
       fwrite(bamout2,file=paste(ch,".reads.txt",sep=""),sep="\t")
@@ -802,6 +821,7 @@ occupancy_Mnase_paired=function(reads_file_list, result_path, chrom_length=NULL,
 
       #fwrite(occu_out,file=paste("Moccu.center.",chrom,".",nameExt,".txt",sep=""),sep="\t")
 
+      occu_out$pos=format(occu_out$pos, scientific=FALSE)
       fwrite(occu_out,file=paste("Moccu.center.",chr,".",nameExt,".txt",sep=""),sep="\t")
 
       bed=data.frame(chrom=chr,
@@ -819,12 +839,18 @@ occupancy_Mnase_paired=function(reads_file_list, result_path, chrom_length=NULL,
 
       chrom=as.character(unique(rmap[,1]))
       occu_out=data.table(chr=rep(chrom,n),pos=c(1:n),occu=as.numeric(occu))
+      occu_out$pos=format(occu_out$pos, scientific=FALSE)
+
       fwrite(occu_out,file=paste("Moccu.unif.",chr,".",nameExt,".txt",sep=""),sep="\t")
       bed=data.frame(chrom=chrom,
                      start=c(0:(n-1)),
                      end=c(1:(n)),
                      score=as.numeric(occu))
       bed=bed[bed$score>0,]
+      
+      bed$start=format(bed$start, scientific=FALSE)
+      bed$end=format(bed$end, scientific=FALSE)
+      
       seqin=Seqinfo(seqnames=chrom, seqlengths=n)
       bed2=makeGRangesFromDataFrame(bed,keep.extra.columns=TRUE, ignore.strand=TRUE,
                                     seqinfo=seqin,starts.in.df.are.0based=TRUE)
@@ -895,6 +921,8 @@ occupancy_Mnase_paired_par=function(reads_file_list, result_path, chrom_length=N
         ####
 
         occu_out=data.table(pos=c(1:n),occu=as.numeric(occu))
+        occu_out$pos=format(occu_out$pos, scientific=FALSE)
+        
         fwrite(occu_out,file=paste("Moccu.center.",chrom,".",nameExt,".txt",sep=""),sep="\t")
 
         bed=data.frame(chrom=chrom,
@@ -918,6 +946,8 @@ occupancy_Mnase_paired_par=function(reads_file_list, result_path, chrom_length=N
         ####
 
         occu_out=data.table(pos=c(1:n),occu=as.numeric(occu))
+        occu_out$pos=format(occu_out$pos, scientific=FALSE)
+        
         fwrite(occu_out,file=paste("Moccu.unif.",chrom,".",nameExt,".txt",sep=""),sep="\t")
         bed=data.frame(chrom=chrom,
                        start=c(0:(n-1)),
